@@ -12,32 +12,53 @@ member application 생성
 # Create your models here.
 
 class Post(models.Model):
-    author = models.ForeignKey( #작성자 User참조
+    author = models.ForeignKey(  # 작성자 User참조
         User,
         on_delete=models.CASCADE
     )
-    image = models.ImageField(null=True,blank=True) # Post image
-    content = models.TextField(null=True,blank=True) # Post content(내용)
+    post_image = models.ImageField(null=True, blank=True)  # Post image
+    post_content = models.TextField(null=True, blank=True)  # Post content(내용)
+    post_created_date = models.DateTimeField(auto_now_add=True)  # Post 생성날짜
+    post_modified_date = models.DateTimeField(auto_now=True)  # Post 수정날짜
     comments = models.ManyToManyField(Comment)
     tags = models.ManyToManyField(Tag)
     post_like = models.ManyToManyField(
         User,
         through=PostLike,
-        related_name='post_like_by_User'
     )
 
     def __str__(self):
-        return '{}의 포스트 : {}'.foramt(self.author,self.content)
-
+        return '{}의 포스트 : {}\n' \
+               '게시일 : {}'.foramt(self.author, self.content, self.created_date)
 
 
 class Comment(models.Model):
-    pass
+    comment_author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )  # 댓글 단 사람
+    comment_content = models.TextField()  # 댓글 내용
+    tags = models.ManyToManyField(
+        Tag
+    )  # 태그
+
+    def __str__(self):
+        return '{}의 포스트 {}에 달린 댓글 {} :'.format(self.post.author,
+                                               self.post.content,
+                                               self.comment_content
+                                               )
 
 
 class PostLike(models.Model):
-    pass
+    postlike_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )  # 좋아요를 누른사람
+    postlike_post = models.ForeignKey(
+        'Post',
+        on_delete=models.CASCADE
+    )  # 좋아요를 누른 게시글
 
 
 class Tag(models.Model):
-    pass
+    tag_name = models.CharField(max_length=20)
