@@ -17,10 +17,10 @@ class Post(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )
-    photo = models.ImageField(null=True, blank=True)  # Post image
+    photo = models.ImageField(upload_to='post',blank=True)  # Post image
     created_date = models.DateTimeField(auto_now_add=True)  # Post 생성날짜
     modified_date = models.DateTimeField(auto_now=True)  # Post 수정날짜
-    tags = models.ManyToManyField('Tag')
+    tags = models.ManyToManyField('Tag',blank=True)
     like_users = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         related_name='like_posts',

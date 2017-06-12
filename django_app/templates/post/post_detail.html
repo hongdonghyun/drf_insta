@@ -1,0 +1,11 @@
+{% extends 'base/base.html' %}
+{% block content %}
+<div class="post-detail">
+    <div class="post">
+        <a href="{% url 'post_detail' pk=post.pk %}"></a>
+        <img src="{{ post.photo.url }}" width="400" alt="">
+        <p>게시일 :{{ post.created_date }}</p>
+    </div>
+
+</div>
+{% endblock %}

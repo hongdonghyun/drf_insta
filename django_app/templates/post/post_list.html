@@ -1,14 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-{% for index in posts %}
-{{ index.author }}
+{% extends 'base/base.html' %}
+{% block content %}
+
+{% for post in posts %}
+<p>{{ post.author }}</p>
+<p>{{ post.photo.url }}</p>
+<img src="{{ post.photo.url }}" width="400" alt="">
+<p>{{ post.created_date }}</p>
+<br>
 {% endfor %}
 
-
-</body>
-</html>
+{% endblock %}
