@@ -1,5 +1,5 @@
 from django.db import models
-from member.models import User
+from django.contrib.auth.models import User
 
 """
 member application 생성
@@ -16,31 +16,35 @@ class Post(models.Model):
         User,
         on_delete=models.CASCADE
     )
-    post_image = models.ImageField(null=True, blank=True)  # Post image
-    post_content = models.TextField(null=True, blank=True)  # Post content(내용)
-    post_created_date = models.DateTimeField(auto_now_add=True)  # Post 생성날짜
-    post_modified_date = models.DateTimeField(auto_now=True)  # Post 수정날짜
-    comments = models.ManyToManyField(Comment)
-    tags = models.ManyToManyField(Tag)
-    post_like = models.ManyToManyField(
+    photo = models.ImageField(null=True, blank=True)  # Post image
+    content = models.TextField(null=True, blank=True)  # Post content(내용)
+    created_date = models.DateTimeField(auto_now_add=True)  # Post 생성날짜
+    modified_date = models.DateTimeField(auto_now=True)  # Post 수정날짜
+    tags = models.ManyToManyField('Tag')
+    like_users = models.ManyToManyField(
         User,
-        through=PostLike,
+        related_name='like_posts',
+        # through='PostLike',
+
     )
 
     def __str__(self):
         return '{}의 포스트 : {}\n' \
-               '게시일 : {}'.foramt(self.author, self.content, self.created_date)
+               '게시일 : {}'.foramt(self.author,
+                                 self.content,
+                                 self.created_date
+                                 )
 
 
 class Comment(models.Model):
-    comment_author = models.ForeignKey(
+    post = models.ForeignKey('Post')
+    author = models.ForeignKey(
         User,
         on_delete=models.CASCADE
     )  # 댓글 단 사람
-    comment_content = models.TextField()  # 댓글 내용
-    tags = models.ManyToManyField(
-        Tag
-    )  # 태그
+    content = models.TextField()  # 댓글 내용
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return '{}의 포스트 {}에 달린 댓글 {} :'.format(self.post.author,
@@ -50,15 +54,11 @@ class Comment(models.Model):
 
 
 class PostLike(models.Model):
-    postlike_user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE
-    )  # 좋아요를 누른사람
-    postlike_post = models.ForeignKey(
-        'Post',
-        on_delete=models.CASCADE
-    )  # 좋아요를 누른 게시글
+    pass
 
 
 class Tag(models.Model):
-    tag_name = models.CharField(max_length=20)
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return 'Tag({})'.format(self.name)
