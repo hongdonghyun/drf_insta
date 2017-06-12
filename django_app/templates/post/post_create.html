@@ -2,16 +2,15 @@
 {% block content %}
 
 
-<form action="" method="POST">
+<form action="" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
 
-    {% for field in form %}
-    <div class='form'>
 
-        {{ field.text }}
-        {{ field.created_date }}
+    <div class='form'>
+        {{ form }}
     </div>
-    {% endfor %}
+
+
     <button class="btn" type="submit">버튼</button>
 </form>
 

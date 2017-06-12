@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
-from .forms import PostCreateForm
+from .forms import PostCreateForm, PostModifyForm
 from .models import Post
 
 User = get_user_model()
@@ -41,16 +41,11 @@ def post_create(request):
         }
         return render(request, 'post/post_create.html', context)
     elif request.method == 'POST':
-        form = PostCreateForm(request.POST)
+        form = PostCreateForm(request.POST, request.FILES)
+
         if form.is_valid():
-            photo = form.cleaned_data['photo']
-            text = form.cleaned_data['text']
-            user = request.user
-            post = Post.objects.create(
-                photo=photo,
-                text=text,
-                author=user,
-            )
+            user = User.objects.first()
+            Post.objects.create(author=user, photo=request.FILES['photo'])
             return redirect('post_list')
         else:
             context = {
@@ -59,9 +54,21 @@ def post_create(request):
             return render(request, 'post/post_create.html', context)
 
 
-def post_modify(request):
-    # 수정
-    pass
+def post_modify(request,pk):
+    post = Post.objects.get(pk=pk)
+    if request.method == 'GET':
+        form = PostModifyForm()
+        context = {
+            'form': form,
+            'post' : post,
+        }
+        return render(request, 'post/post_create.html', context)
+    elif request.method == 'POST':
+        form = PostModifyForm(request.POST, request.FILES)
+        if form.is_valid():
+            post.photo = request.FILES['photo']
+            post.save()
+            return redirect('post_detail', pk=post.pk)
 
 
 def post_delete(request, post_pk):

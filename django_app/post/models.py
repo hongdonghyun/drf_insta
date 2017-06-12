@@ -18,7 +18,7 @@ class Post(models.Model):
         on_delete=models.CASCADE
     )
     photo = models.ImageField(upload_to='post',blank=True)  # Post image
-    created_date = models.DateTimeField(auto_now_add=True)  # Post 생성날짜
+    created_date = models.DateTimeField(auto_now_add=True,blank=True)  # Post 생성날짜
     modified_date = models.DateTimeField(auto_now=True)  # Post 수정날짜
     tags = models.ManyToManyField('Tag',blank=True)
     like_users = models.ManyToManyField(
