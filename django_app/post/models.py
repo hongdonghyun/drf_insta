@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import *
 
 """
 member application 생성
@@ -17,27 +18,34 @@ class Post(models.Model):
         on_delete=models.CASCADE
     )
     photo = models.ImageField(null=True, blank=True)  # Post image
-    content = models.TextField(null=True, blank=True)  # Post content(내용)
     created_date = models.DateTimeField(auto_now_add=True)  # Post 생성날짜
     modified_date = models.DateTimeField(auto_now=True)  # Post 수정날짜
     tags = models.ManyToManyField('Tag')
     like_users = models.ManyToManyField(
         User,
         related_name='like_posts',
-        # through='PostLike',
+        through='PostLike',
+
+
 
     )
 
-    def __str__(self):
-        return '{}의 포스트 : {}\n' \
-               '게시일 : {}'.foramt(self.author,
-                                 self.content,
-                                 self.created_date
-                                 )
+    def add_comment(self, user, content):
+        # 자신을 post로 갖고 전달받은 user를 author로 가지며
+        # content를 content필드내용으로 넣는 Comment 객체 생성
+        self.comment_set.create(author=user, content=content)
+
+    def add_tag(self, tag_name):
+        # tags에 tag매개변수로 전달된 값(str)을
+        # name으로 갖는 Tag객체를 (존재한다면)가져오고 없으면 생성하여
+        # 자신의 tags에 추가
+        tag, tag_created = Tag.objects.get_or_create(name=tag_name)
+        if self.tags.filter(name=tag_name).exitsts():#id=tag.id
+            self.tags.add(tag)
 
 
 class Comment(models.Model):
-    post = models.ForeignKey('Post')
+    post = models.ForeignKey(Post)
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE
@@ -45,20 +53,25 @@ class Comment(models.Model):
     content = models.TextField()  # 댓글 내용
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return '{}의 포스트 {}에 달린 댓글 {} :'.format(self.post.author,
-                                               self.post.content,
-                                               self.comment_content
-                                               )
+    like_users = models.ManyToManyField(
+        User,
+        through='CommentLike',
+        related_name='like_comments'
+    )
 
 
 class PostLike(models.Model):
-    pass
+    post = models.ForeignKey(Post)
+    user = models.ForeignKey(User)
+    created_date = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        db_table = 'post_post_like_users'
+
+class CommentLike(models.Model):
+    comment =models.ForeignKey(Comment)
+    user = models.ForeignKey(User)
+    created_date = models.DateTimeField(auto_now_add=True)
 
 class Tag(models.Model):
     name = models.CharField(max_length=50)
-
-    def __str__(self):
-        return 'Tag({})'.format(self.name)
