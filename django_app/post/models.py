@@ -29,6 +29,9 @@ class Post(models.Model):
 
 
     )
+    @property
+    def like_count(self):
+        return self.like_users.count()
 
     def add_comment(self, user, content):
         # 자신을 post로 갖고 전달받은 user를 author로 가지며
