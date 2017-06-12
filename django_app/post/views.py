@@ -54,13 +54,13 @@ def post_create(request):
             return render(request, 'post/post_create.html', context)
 
 
-def post_modify(request,pk):
+def post_modify(request, pk):
     post = Post.objects.get(pk=pk)
     if request.method == 'GET':
         form = PostModifyForm()
         context = {
             'form': form,
-            'post' : post,
+            'post': post,
         }
         return render(request, 'post/post_create.html', context)
     elif request.method == 'POST':
