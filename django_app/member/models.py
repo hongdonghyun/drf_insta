@@ -1,6 +1,7 @@
-from django.db import models
+from django.contrib.auth.models import AbstractUser
 
-class User(models.Model):
-    username = models.CharField(max_length=20)
-    nickname = models.CharField(max_length=20)
 
+class User(AbstractUser):
+    pass
+
+# User모델을 AUTH_USER_MODEL로 사용하도록 settings.py에 설정

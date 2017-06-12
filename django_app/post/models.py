@@ -1,6 +1,6 @@
+from django.conf import settings
 from django.db import models
-from django.contrib.auth.models import User
-from datetime import *
+
 
 """
 member application 생성
@@ -14,7 +14,7 @@ member application 생성
 
 class Post(models.Model):
     author = models.ForeignKey(  # 작성자 User참조
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )
     photo = models.ImageField(null=True, blank=True)  # Post image
@@ -22,7 +22,7 @@ class Post(models.Model):
     modified_date = models.DateTimeField(auto_now=True)  # Post 수정날짜
     tags = models.ManyToManyField('Tag')
     like_users = models.ManyToManyField(
-        User,
+        settings.AUTH_USER_MODEL,
         related_name='like_posts',
         through='PostLike',
 
@@ -50,14 +50,14 @@ class Post(models.Model):
 class Comment(models.Model):
     post = models.ForeignKey(Post)
     author = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )  # 댓글 단 사람
     content = models.TextField()  # 댓글 내용
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
     like_users = models.ManyToManyField(
-        User,
+        settings.AUTH_USER_MODEL,
         through='CommentLike',
         related_name='like_comments'
     )
@@ -65,15 +65,12 @@ class Comment(models.Model):
 
 class PostLike(models.Model):
     post = models.ForeignKey(Post)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     created_date = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        db_table = 'post_post_like_users'
 
 class CommentLike(models.Model):
     comment =models.ForeignKey(Comment)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     created_date = models.DateTimeField(auto_now_add=True)
 
 class Tag(models.Model):
