@@ -25,7 +25,14 @@ def post_list(request):
 
 def post_detail(request, pk):
     # post_pk에 해당하는 Post객체를 리턴,보여줌
-    posts = Post.objects.get(pk=pk)
+
+    # 가져오는 과정에서 예외처리를 한다 (Model.DoesNotExist)
+    try:
+        posts = Post.objects.get(pk=pk)
+    except Post.DoesNotExist as e:
+        # 1. 404 Notfound를 띄운다
+        # 2. redirect로 화면을 되돌린다.
+        return HttpResponse('Post not found, detail :{}'.format(e))
     context = {
         'post': posts
     }
