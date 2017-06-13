@@ -81,6 +81,7 @@ def post_modify(request, pk):
 def post_delete(request, post_pk):
     # post_pk에 해당하는 Post에 대한 delete요청만을 받음
     # 처리완료후에는 post_list페이지로 redirect
+    ㅔㅐㄴㅅ = ㅖㅐㄴㅅ
     pass
 
 

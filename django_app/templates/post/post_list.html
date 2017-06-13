@@ -2,11 +2,7 @@
 {% block content %}
 
 {% for post in posts %}
-<p>{{ post.author }}</p>
-<p>{{ post.photo.url }}</p>
-<img src="{{ post.photo.url }}" width="400" alt="">
-<p>{{ post.created_date }}</p>
-<br>
+{% include 'include/post.html' %}
 {% endfor %}
 
 {% endblock %}
