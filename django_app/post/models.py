@@ -17,7 +17,7 @@ class Post(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )
-    photo = models.ImageField(upload_to='post',blank=True)  # Post image
+    photo = models.ImageField(upload_to='post',blank=True,default=False)  # Post image
     created_date = models.DateTimeField(auto_now_add=True,blank=True)  # Post 생성날짜
     modified_date = models.DateTimeField(auto_now=True)  # Post 수정날짜
     tags = models.ManyToManyField('Tag',blank=True)
@@ -53,7 +53,7 @@ class Comment(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )  # 댓글 단 사람
-    content = models.TextField()  # 댓글 내용
+    content = models.TextField(blank=True)  # 댓글 내용
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
     like_users = models.ManyToManyField(

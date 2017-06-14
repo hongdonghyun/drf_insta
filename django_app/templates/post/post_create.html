@@ -1,17 +1,20 @@
 {% extends 'base/base.html' %}
 {% block content %}
 
-
-<form action="" method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-
-
-    <div class='form'>
-        {{ form }}
-    </div>
+<div>
+    <form action="" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <!--<input type="file" name="file">-->
+        <!--<input type="text" name="comment" placeholder="댓글">-->
 
 
-    <button class="btn" type="submit">버튼</button>
-</form>
+        <div class='form'>
+            {{ form }}
+        </div>
+
+
+        <button class="btn" type="submit">등록</button>
+    </form>
+</div>
 
 {% endblock %}

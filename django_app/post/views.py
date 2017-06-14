@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from .forms import PostCreateForm, PostModifyForm
-from .models import Post
+from .models import Post, Comment
 
 User = get_user_model()
 
@@ -52,8 +52,24 @@ def post_create(request):
 
         if form.is_valid():
             user = User.objects.first()
-            Post.objects.create(author=user, photo=request.FILES['photo'])
+            post = Post.objects.create(author=user, photo=request.FILES['photo'])
+
+            # post요청시 name이 comment인 input에서 가져옴
+            # dict.get
+            comment_string = form.cleaned_data['content']
+            # 빈 문자열이나 None모두 False로 평가되므로
+            # if not으로 댓글로 쓸 내용 또는 comment키가 전달되지 않았음을 검사가능
+            if not comment_string == '':
+                post.comment_set.create(
+                    author=user,
+                    post=post,
+                    content=comment_string,
+                )
+            else:
+                pass
+
             return redirect('post_list')
+
         else:
             context = {
                 'form': form
@@ -63,6 +79,7 @@ def post_create(request):
 
 def post_modify(request, pk):
     post = Post.objects.get(pk=pk)
+    comment = Comment.objects.get(pk=pk)
     if request.method == 'GET':
         form = PostModifyForm()
         context = {
@@ -74,22 +91,21 @@ def post_modify(request, pk):
         form = PostModifyForm(request.POST, request.FILES)
         if form.is_valid():
             post.photo = request.FILES['photo']
+            comment.content = form.cleaned_data['content']
             post.save()
+            comment.save()
             return redirect('post_detail', pk=post.pk)
 
 
-def post_delete(request, post_pk):
+def post_delete(request, pk):
     # post_pk에 해당하는 Post에 대한 delete요청만을 받음
     # 처리완료후에는 post_list페이지로 redirect
-    ㅔㅐㄴㅅ = ㅖㅐㄴㅅ
-    pass
+    post = Post.objects.get(pk=pk)
+    comment = Comment.objects.get(pk=pk)
+    post.delete()
+    return redirect('post_list')
 
 
-def comment_create(request, posk_pk):
-    # POST요청을 받아 Comment객체를 생성 후 post_detail페이지로 redirect
-    pass
 
 
-def comment_delete(request, posk_pk, comment):
-    # POST요청을 받아 Comment객체를 delete, 이후 post_detail페이지로 redirect
-    pass
+
