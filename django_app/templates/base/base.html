@@ -1,6 +1,6 @@
 {% load static %}
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -11,14 +11,14 @@
     <link rel="stylesheet" href="{% static '/css/layout.min.css' %}">
     <link rel="stylesheet" href="{% static '/css/post.min.css' %}">
     <link rel="stylesheet" href="{% static '/css/common.min.css' %}">
-    <title>Document</title>
+    <title>Hongstagram</title>
 </head>
 <body>
 <div id="wrap">
     <header class="top-header">
         <nav>
             <div class="nav-left nav-item">
-                <a href="#">
+                <a href="{% url 'post_list' %}">
                     <img src="{% static 'images/logo.png' %}" alt="">
                 </a>
             </div>
@@ -26,7 +26,7 @@
                 <input type="text" placeholder="검색">
             </div>
             <div class="nav-right nav-item">
-                <a href="#">
+                <a href="">
                     <img src="{% static 'images/icon_explore.png' %}" alt="">
                 </a>
                 <a href="#">
