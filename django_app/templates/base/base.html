@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{% static '/css/base.min.css' %}">
     <link rel="stylesheet" href="{% static '/css/layout.min.css' %}">
     <link rel="stylesheet" href="{% static '/css/post.min.css' %}">
+    <link rel="stylesheet" href="{% static '/css/common.min.css' %}">
     <title>Document</title>
 </head>
 <body>
@@ -36,22 +37,31 @@
                 </a>
             </div>
         </nav>
+        <nav>
+            <div>
+                <div>
+                    {% if user.is_authenticated %}
+                    <span>{{ user }}</span> 이 로그인 중입니다.
+                    <a href="{% url 'member:logout' %}" class="btn">로그아웃</a>
+                </div>
+
+                <div>
+                    {% else %}
+                    <a href="{% url 'member:login' %}" class="btn">로그인</a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
     </header>
 
-    <div class="test">
 
-        {% if user.is_authenticated %}
-        {{ user }} <span>이 로그인 중입니다.</span>
-        {% else %}
-        <span>로그인 하세요</span>
-        {% endif %}
+</div>
 
-    </div>
 
-    <div class="container">
-        {% block content %}
-        {% endblock %}
-    </div>
+<div class="container">
+    {% block content %}
+    {% endblock %}
+</div>
 </div>
 
 </body>
