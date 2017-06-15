@@ -1,8 +1,10 @@
 from django.contrib.auth import authenticate, \
     login as django_login, \
-    logout as django_logout
+    logout as django_logout, get_user_model
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+
+User = get_user_model()
 
 
 def login(request):
@@ -49,19 +51,35 @@ def logout(request):
 
 
 def signup(request):
-    # meber/signup.html사용
+    # member/signup.html사용
     # username, password1 password2를 받아 회원가입
     # 이미 유저가 존재하는지 검사
     # password1 password2가 일치하는 검사
     # 각각의 경우를 검사해서 틀릴경우 오류메시지 리턴
     # 가입에 성공시 로그인시키고 post_list redirect
-    username = request.POST['username']
-    password1 = request.POST['password1']
-    password2 = request.POST['password2']
-    user = authenticate(request, username=username, password=password1)
-    if request.method == "POST":
-            # if username == authenticate.username
-        pass
 
+
+    if request.method == "POST":
+        username = request.POST['username']
+        password1 = request.POST['password1']
+        password2 = request.POST['password2']
+        # 유저가 있는지 없는지 검사
+        if User.objects.filter(username=username).exists():
+            # 이미 존재한다면
+            return HttpResponse('Username is already exist')
+        # 비밀번호가 같은경우
+        elif password1 != password2:
+            return HttpResponse('Password and Password check are not equal')
+        # 유저 생성
+        user = User.objects.create_user(
+            username=username,
+            password=password1,
+        )
+
+        django_login(request, user)
+        return redirect('post_list')
     else:
-        pass
+        return render(request, 'member/signup.html')
+
+def change_password(request):
+    pass
