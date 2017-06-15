@@ -1,8 +1,8 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login as django_login
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-
+from member.forms import LoginForm
 from .forms import PostCreateForm, PostModifyForm
 from .models import Post, Comment
 
@@ -16,11 +16,24 @@ def post_list(request):
     # 각 포스트에 대해 최대 4개까지의 댓글을 보여주도록 템플릿에 설정
     posts = Post.objects.all()
 
-    context = {
-        'posts': posts
-    }
+    form = LoginForm(data=request.POST)
+    if request.method =="POST":
+        if form.is_valid():
+            user = form.cleaned_data['user']
+            django_login(request, user)
+            return redirect('post_list')
+        # authenticate함수를 사용해서 User객체를 얻어 user에 할당
+        # 인증에 실패할 경우 user변수에는 None할당
+    else:
 
-    return render(request, 'post/post_list.html', context)
+        form = LoginForm()
+
+        context = {
+            'form': form,
+            'posts': posts
+        }
+
+        return render(request, 'post/post_list.html', context)
 
 
 def post_detail(request, pk):
@@ -104,8 +117,3 @@ def post_delete(request, pk):
     comment = Comment.objects.get(pk=pk)
     post.delete()
     return redirect('post_list')
-
-
-
-
-

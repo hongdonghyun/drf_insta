@@ -4,6 +4,8 @@ from django.contrib.auth import authenticate, \
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
+from member.forms import LoginForm
+
 User = get_user_model()
 
 
@@ -18,18 +20,27 @@ def login(request):
     if request.method == "POST":
         # 요청받은 POST데이터에서 id,password키가 가진 값들을
         # username,password변수에 할당 (문자열
-        username = request.POST['username']
-        password = request.POST['password']
+        # username = request.POST['username']
+        # password = request.POST['password']
+
+        # # user변수가 None이 아닐 경우
+        # if user is not None:
+        #     # Django의 session을 이용해 이번 request와 user객체를 사용해 로그인 처리
+        #     # 이후의 request/response에서는 사용자가 인증된 상태
+        #     django_login(request, user)
+        #     # 로그인 완료후에는 post_list뷰로 리다이렉트 처리
+        #     return redirect('post_list')
+
+        form = LoginForm(data=request.POST)
         # authenticate함수를 사용해서 User객체를 얻어 user에 할당
         # 인증에 실패할 경우 user변수에는 None할당
-        user = authenticate(request, username=username, password=password)
-        # user변수가 None이 아닐 경우
-        if user is not None:
-            # Django의 session을 이용해 이번 request와 user객체를 사용해 로그인 처리
-            # 이후의 request/response에서는 사용자가 인증된 상태
+
+
+        if form.is_valid():
+            user = form.cleaned_data['user']
             django_login(request, user)
-            # 로그인 완료후에는 post_list뷰로 리다이렉트 처리
             return redirect('post_list')
+
         # user변수가 None일 경우
         else:
             # 로그인에 실패했음을 알림
@@ -41,7 +52,11 @@ def login(request):
         # 아닐경우 login.html을 render해서 리턴
         if request.user.is_authenticated:
             return redirect('post_list')
-        return render(request, 'member/login.html')
+        form = LoginForm()
+        context = {
+            'form': form
+        }
+        return render(request, 'member/login.html', context)
 
 
 def logout(request):
@@ -81,5 +96,24 @@ def signup(request):
     else:
         return render(request, 'member/signup.html')
 
+
 def change_password(request):
-    pass
+    if request.user.is_authenticated:
+
+        # if request.method == "POST":
+        password1 = request.POST['password1']
+        password2 = request.POST['password2']
+        password3 = request.POST['password3']
+
+        if password1 == password2:
+            return HttpResponse(" Enter a different password than your current password")
+        elif password2 != password3:
+            return HttpResponse('Password and Password check are not equal')
+        else:
+            User.set_password(password2)
+            return redirect('post_list')
+
+    else:
+        return HttpResponse("Please login and use")
+        # else:
+        #     return render(request, 'member/login.html')

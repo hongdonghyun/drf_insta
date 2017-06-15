@@ -3,12 +3,7 @@
 <div>
     <form action="" method="POST">
         {% csrf_token %}
-        <div>
-            ID:<input type="text" name="username" placeholder="ID">
-        </div>
-        <div>
-            PWD:<input type="password" name="password" placeholder="비밀번호">
-        </div>
+        {{ form }}
         <button type="submit">로그인</button>
     </form>
 </div>

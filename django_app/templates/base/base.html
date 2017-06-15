@@ -47,7 +47,14 @@
 
                 <div>
                     {% else %}
-                    <a href="{% url 'member:login' %}" class="btn">로그인</a>
+
+                    <div>
+                        <form action="" method="POST">
+                            {% csrf_token %}
+                            {{ form }}
+                            <button type="submit"><a href="{% url 'member:login' %}">로그인</a></button>
+                        </form>
+                    </div>
                     {% endif %}
                 </div>
             </div>
