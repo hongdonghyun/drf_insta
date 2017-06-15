@@ -1,4 +1,6 @@
-from django.contrib.auth import authenticate, login as django_login
+from django.contrib.auth import authenticate, \
+    login as django_login, \
+    logout as django_logout
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
@@ -28,13 +30,19 @@ def login(request):
             return redirect('post_list')
         # user변수가 None일 경우
         else:
-            #로그인에 실패했음을 알림
+            # 로그인에 실패했음을 알림
             return HttpResponse("Login invalid")
-    #GET요청이 왔을경우 단순 로그인 폼만 보여준다
+    # GET요청이 왔을경우 단순 로그인 폼만 보여준다
     else:
-        #만약 이미 로그인 된 상태일 경우에는
-        #post_list로 redirect
-        #아닐경우 login.html을 render해서 리턴
+        # 만약 이미 로그인 된 상태일 경우에는
+        # post_list로 redirect
+        # 아닐경우 login.html을 render해서 리턴
         if request.user.is_authenticated:
             return redirect('post_list')
         return render(request, 'member/login.html')
+
+
+def logout(request):
+    # 로그아웃 되면 post_list로 redirect
+    django_logout(request)
+    return redirect('post_list')
