@@ -9,3 +9,9 @@ input[type=text], input[type=password] {
   font-size: 12px;
   outline: none;
   padding: 3px 10px 3px 10px; }
+
+.test {
+  padding: 10px;
+  color: white;
+  background-color: red;
+  font-size: 14px; }
