@@ -16,7 +16,7 @@ def login(request):
     if request.method == "POST":
         # 요청받은 POST데이터에서 id,password키가 가진 값들을
         # username,password변수에 할당 (문자열
-        username = request.POST['id']
+        username = request.POST['username']
         password = request.POST['password']
         # authenticate함수를 사용해서 User객체를 얻어 user에 할당
         # 인증에 실패할 경우 user변수에는 None할당
@@ -46,3 +46,22 @@ def logout(request):
     # 로그아웃 되면 post_list로 redirect
     django_logout(request)
     return redirect('post_list')
+
+
+def signup(request):
+    # meber/signup.html사용
+    # username, password1 password2를 받아 회원가입
+    # 이미 유저가 존재하는지 검사
+    # password1 password2가 일치하는 검사
+    # 각각의 경우를 검사해서 틀릴경우 오류메시지 리턴
+    # 가입에 성공시 로그인시키고 post_list redirect
+    username = request.POST['username']
+    password1 = request.POST['password1']
+    password2 = request.POST['password2']
+    user = authenticate(request, username=username, password=password1)
+    if request.method == "POST":
+            # if username == authenticate.username
+        pass
+
+    else:
+        pass
