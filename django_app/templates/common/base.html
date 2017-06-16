@@ -51,14 +51,18 @@
             -->
             <div>
                 {% if user.is_authenticated %}
-                <span>{{ user }}로 로그인 중</span>
+                <span>Hello! {{ user }}</span>
                 <a href="{% url 'member:logout' %}" class="btn">로그아웃</a>
                 {% else %}
                 <form action="{% url 'member:login' %}" method="POST" class="form-inline-login">
+                    {% csrf_token %}
                     {{ login_form }}
-                    <a href="{% url 'member:login' %}" class="btn">로그인</a>
-                    {% endif %}
+
+                    <button type="submit">로그인</button>
                 </form>
+                <a href="{% url 'member:signup' %}" class="btn">회원가입</a>
+                {% endif %}
+
             </div>
         </nav>
     </header>
