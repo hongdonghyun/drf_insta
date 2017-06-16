@@ -5,8 +5,8 @@ header.top-header {
 header.top-header > nav:nth-child(1) {
   max-width: 1010px;
   margin: 0 auto;
-  height: 83px;
   padding: 0 10px;
+  height: 83px;
 }
 
 header.top-header > nav:nth-child(1) .nav-item {
@@ -31,8 +31,8 @@ header.top-header > nav:nth-child(1) .nav-left {
 }
 
 header.top-header > nav:nth-child(1) .nav-center {
-  float: left;
   width: 147px;
+  float: left;
 }
 
 @media screen and (max-width: 700px) {
@@ -42,8 +42,8 @@ header.top-header > nav:nth-child(1) .nav-center {
 }
 
 header.top-header > nav:nth-child(1) .nav-right {
-  float: right;
   width: 150px;
+  float: right;
 }
 
 header.top-header > nav:nth-child(1) .nav-right a {
@@ -71,4 +71,8 @@ header.top-header > nav:nth-child(2) > div {
   .container {
     padding-top: 0;
   }
+}
+
+.container > .content {
+  padding: 0 10px;
 }
