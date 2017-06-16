@@ -7,6 +7,11 @@ User = get_user_model()
 class SignupForm(forms.Form):
     # SignupForm을 구성하고 해당 form을 view에서 사용하도록 설정
     username = forms.CharField(
+        help_text='Signup help text test',
+        widget=forms.TextInput
+    )
+    nickname = forms.CharField(
+        help_text='Signup help text test',
         widget=forms.TextInput
     )
     password1 = forms.CharField(
@@ -26,6 +31,14 @@ class SignupForm(forms.Form):
             )
         return username
 
+    def clean_nickname(self):
+        nickname = self.cleaned_data.get('nickname')
+        if nickname and User.objects.filter(nickname=nickname).exists():
+            raise forms.ValidationError(
+                'nickname already exist'
+            )
+        return nickname
+
     # clean_<fieldname>메서드를 사용해서
     # password2필드에 대한 유효성 검증을 실행
     # 만약 password1이라고한다면 class에서 password1이 들어왔을때
@@ -41,9 +54,13 @@ class SignupForm(forms.Form):
 
     def create_user(self):
         username = self.cleaned_data['username']
+        nickname = self.cleaned_data['nickname']
         password1 = self.cleaned_data['password1']
         password2 = self.cleaned_data['password2']
         return User.objects.create_user(
             username=username,
-            password=password2,
+            nickname=nickname,
+            password=password2
         )
+
+
