@@ -109,9 +109,15 @@ def post_create(request):
         form = PostForm(data=request.POST, files=request.FILES)
         if form.is_valid():
             # ModelForm의 save()메서드를 사용해서 Post객체를 가져옴
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
+            post = form.save(author=request.user)
+            # post.author = request.user
+            # post.save()
+            # comment_string = form.cleaned_data['comment']
+            # if comment_string:
+            #     post.comment_set.create(
+            #         author=post.author,
+            #         content=comment_string,
+            # )
             return redirect('post:post_detail', post_pk=post.pk)
     else:
         # post/post_create.html을 render해서 리턴
@@ -123,7 +129,7 @@ def post_create(request):
 
 
 def post_modify(request, post_pk):
-    # 수정
+    # if request.method(request):
     pass
 
 

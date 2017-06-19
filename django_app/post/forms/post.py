@@ -22,3 +22,20 @@ class PostForm(forms.ModelForm):
             'photo',
             'comment',
         )
+
+    # comment필드를 사용해 comment객체를 생성 db에저장
+    def save(self, **kwargs):
+        commit = kwargs.get('commit', True)
+        author = kwargs.pop('author', None)
+
+        self.instance.author = author
+        instance = super().save(**kwargs)
+
+        comment_string = self.cleaned_data['comment']
+        if commit and comment_string:
+            instance.comment_set.create(
+                author=instance.author,
+                content=comment_string,
+            )
+
+        return instance
