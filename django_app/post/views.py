@@ -129,7 +129,9 @@ def post_create(request):
 
 
 def post_modify(request, post_pk):
-    # if request.method(request):
+    # if request.method == "POST":
+    #     form = PostForm(data=request.POST,files=request.FILES)
+    #     if form.is_valid():
     pass
 
 
