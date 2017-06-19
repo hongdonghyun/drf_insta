@@ -13,18 +13,29 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
+from django.conf import settings
 from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.conf import settings
+from django.views.generic import RedirectView
 
 from . import views
 
 urlpatterns = [
-    url(r'^$',views.index),
     url(r'^admin/', admin.site.urls),
+
+    # post앱의 index뷰를 root url에 연결시킨다.
+    # url(r'^$', post_views.index),
+
+    # 새 view를 만들어 redirect시키는 방법
+    url(r'^$', views.index, name='index'),
+
+    # Class-based View중 RedirectView를 사용하는 방법
+    # url(r'^$', RedirectView.as_view(pattern_name='post:post_list')),
+
+    # post앱의 urls.py모듈을 include시킨다
     url(r'^post/', include('post.urls')),
-    url(r'^member/',include('member.urls')),
+    url(r'^member/', include('member.urls')),
 ]
 urlpatterns += static(
     prefix=settings.MEDIA_URL,

@@ -16,9 +16,9 @@ class Post(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
     my_comment = models.OneToOneField(
         'Comment',
-        related_name='+',
+        blank=True,
         null=True,
-        blank=True
+        related_name='+'
     )
     like_users = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
@@ -28,7 +28,7 @@ class Post(models.Model):
     tags = models.ManyToManyField('Tag', blank=True)
 
     class Meta:
-        ordering = ['-pk',]
+        ordering = ['-pk', ]
 
     def add_comment(self, user, content):
         # 자신을 post로 갖고, 전달받은 user를 author로 가지며

@@ -7,7 +7,7 @@ User = get_user_model()
 class SignupForm(forms.Form):
     # SignupForm을 구성하고 해당 form을 view에서 사용하도록 설정
     username = forms.CharField(
-        help_text='유저명이 이미 존재하고 있습니다.',
+        help_text='Signup help text test',
         widget=forms.TextInput
     )
     nickname = forms.CharField(
