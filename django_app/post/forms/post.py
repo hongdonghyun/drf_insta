@@ -1,6 +1,9 @@
 from django import forms
+from django.contrib.auth import get_user_model
 
 from ..models import Post, Comment
+
+User = get_user_model()
 
 
 class PostForm(forms.ModelForm):
@@ -31,8 +34,13 @@ class PostForm(forms.ModelForm):
         # 전달된 키워드인수중 'author'키 값을 가져오고, 기존 kwargs dict에서 제외
         author = kwargs.pop('author', None)
 
+        # self.instance.pk가 존재 하지 않거나(새로 생성하는 경우)
+        # author가 None이 아닌경우
+        # 두 가지중 하나이면 self.instance.author에 전달된 author또는 None값을 할당
+        if not self.instance.pk or isinstance(author, User):
+            self.instance.author = author
+
         # super()의 save()호출
-        self.instance.author = author
         instance = super().save(**kwargs)
 
         # commit인수가 True이며 comment필드가 채워져 있을 경우 Comment생성 로직을 진행
