@@ -1,9 +1,8 @@
-from .forms import LoginForm, SignupForm
+from .forms import LoginForm
 
 
 def forms(request):
     context = {
-        'login_form': LoginForm,
-        'sign_form': SignupForm,
+        'login_form': LoginForm(),
     }
     return context
