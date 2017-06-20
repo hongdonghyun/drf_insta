@@ -9,5 +9,4 @@ def post_owner(f):
         if request.user == post.author:
             return f(request, *args, **kwargs)
         raise PermissionDenied
-
     return wrap

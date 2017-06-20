@@ -7,18 +7,19 @@ from django.urls import reverse
 
 from post.decorators import post_owner
 from post.forms import CommentForm
-from post.forms import PostForm
-from post.models import Post
+from ..forms import PostForm
+from ..models import Post
 
+# 자동으로 Django에서 인증에 사용하는 User모델클래스를 리턴
+#   https://docs.djangoproject.com/en/1.11/topics/auth/customizing/#django.contrib.auth.get_user_model
 User = get_user_model()
 
 __all__ = (
     'post_list',
-    'post_delete',
-    'post_create',
     'post_detail',
+    'post_create',
     'post_modify',
-    'post_anyway',
+    'post_delete',
 )
 
 
@@ -27,10 +28,11 @@ def post_list(request):
     # post/post_list.html을 template으로 사용하도록 한다
 
     # 각 포스트에 대해 최대 4개까지의 댓글을 보여주도록 템플릿에 설정
+    # 각 post하나당 CommentForm을 하나씩 가지도록 리스트 컴프리헨션 사용
     posts = Post.objects.all()
     context = {
         'posts': posts,
-        'comment_form': CommentForm,
+        'comment_form': CommentForm(),
     }
     return render(request, 'post/post_list.html', context)
 
@@ -43,7 +45,7 @@ def post_detail(request, post_pk):
     # 가져오는 과정에서 예외처리를 한다 (Model.DoesNotExist)
     try:
         post = Post.objects.get(pk=post_pk)
-    except Post.DoesNotExist as e:
+    except Post.DoesNotExist:
         # 1. 404 Notfound를 띄워준다
         # return HttpResponseNotFound('Post not found, detail: {}'.format(e))
 
@@ -152,16 +154,14 @@ def post_modify(request, post_pk):
 @post_owner
 @login_required
 def post_delete(request, post_pk):
+    # post_pk에 해당하는 Post에 대한 delete요청만을 받음
+    # 처리완료후에는 post_list페이지로 redirect
     post = get_object_or_404(Post, pk=post_pk)
-    if request.method == "POST":
+    if request.method == 'POST':
         post.delete()
         return redirect('post:post_list')
     else:
         context = {
-            'post': post
+            'post': post,
         }
         return render(request, 'post/post_delete.html', context)
-
-
-def post_anyway(request):
-    return redirect('post:post_list')

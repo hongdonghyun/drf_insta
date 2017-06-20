@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
 
 from ..models import Post, Comment
 
@@ -34,12 +35,11 @@ class PostForm(forms.ModelForm):
         # 전달된 키워드인수중 'author'키 값을 가져오고, 기존 kwargs dict에서 제외
         author = kwargs.pop('author', None)
 
-        # self.instance.pk가 존재 하지 않거나(새로 생성하는 경우)
-        # author가 None이 아닌경우
-        # 두 가지중 하나이면 self.instance.author에 전달된 author또는 None값을 할당
+        # self.instance.pk가 존재하지 않거나(새로 생성하거나)
+        # author가 User인스턴스일 경우
+        # 두 가지중 하나이면 self.instance.author에 전달된 author값을 할당(User거나 None일 수 있음)
         if not self.instance.pk or isinstance(author, User):
             self.instance.author = author
-
         # super()의 save()호출
         instance = super().save(**kwargs)
 
@@ -64,4 +64,3 @@ class PostForm(forms.ModelForm):
             instance.save()
         # ModelForm의 save()에서 반환해야 하는 model의 instance리턴
         return instance
-

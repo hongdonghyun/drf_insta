@@ -12,12 +12,12 @@
 .btn-xs {
   font-size: 10px;
   padding: 2px 6px;
-  border-radius: 3px;
-  line-height: 1.6px;
+  border-radius: 1px;
+  line-height: 1.6;
 }
 .field-wrapper {
   margin-bottom: 10px;
-
+  
   ul.errors {
     font-size: 11px;
     color: red;
@@ -42,7 +42,6 @@
     margin-bottom: 0;
   }
 }
-
 form.form-inline {
   display: inline-block;
 }
