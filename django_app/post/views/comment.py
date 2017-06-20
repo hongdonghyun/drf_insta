@@ -38,13 +38,18 @@ def comment_create(request, post_pk):
         return redirect(next)
     return redirect('post:post_detail', post_pk=post.pk)
 
-
+@login_required
 def comment_modify(request, comment_pk):
     # 수정
     # CommentForm을 만들어서 해당 ModelForm안에서 생성/수정가능하도록 사용
+    next = request.GET.get('next')
     comment = get_object_or_404(Comment, pk=comment_pk)
     if request.method == 'POST':
-        pass
+        form = CommentForm(data=request.POST,instance=comment)
+        form.save()
+        if next:
+            return redirect(next)
+        return redirect('post:post_detail',post_pk=comment.post.pk)
     else:
         form = CommentForm(instance=comment)
     context = {

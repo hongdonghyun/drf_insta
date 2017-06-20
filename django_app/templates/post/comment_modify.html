@@ -8,6 +8,7 @@ template안에서 request.GET의 내용을 쓰는법
 <div class="content">
 	<h3>Comment modify</h3>
 	<form action="" method="POST">
+		{% csrf_token %}
 		{% include 'include/field_set.html' %}
 		<button type="submit" class="btn">수정</button>
 	</form>
