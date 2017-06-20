@@ -11,7 +11,7 @@
 }
 .field-wrapper {
   margin-bottom: 10px;
-  
+
   ul.errors {
     font-size: 11px;
     color: red;
@@ -35,4 +35,8 @@
     margin-top: 2px;
     margin-bottom: 0;
   }
+}
+
+form.form-inline {
+  display: inline-block;
 }

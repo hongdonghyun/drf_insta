@@ -64,3 +64,4 @@ class PostForm(forms.ModelForm):
             instance.save()
         # ModelForm의 save()에서 반환해야 하는 model의 instance리턴
         return instance
+
