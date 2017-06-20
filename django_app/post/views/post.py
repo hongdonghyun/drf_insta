@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
@@ -8,7 +9,7 @@ from django.urls import reverse
 from post.decorators import post_owner
 from post.forms import CommentForm
 from ..forms import PostForm
-from ..models import Post
+from ..models import Post, Tag
 
 # 자동으로 Django에서 인증에 사용하는 User모델클래스를 리턴
 #   https://docs.djangoproject.com/en/1.11/topics/auth/customizing/#django.contrib.auth.get_user_model
@@ -20,6 +21,8 @@ __all__ = (
     'post_create',
     'post_modify',
     'post_delete',
+    'hashtag_post_list',
+    'post_like',
 )
 
 
@@ -28,12 +31,26 @@ def post_list(request):
     # post/post_list.html을 template으로 사용하도록 한다
 
     # 각 포스트에 대해 최대 4개까지의 댓글을 보여주도록 템플릿에 설정
-    # 각 post하나당 CommentForm을 하나씩 가지도록 리스트 컴프리헨션 사용
+
+    # 여기숙제
+    # post_list와 hashtag_post_list에서 pagination을 이용해서
+    # 한번에 10개씩만 표시되도 수정
     posts = Post.objects.all()
+    paginator = Paginator(posts, 10)
+    page = request.GET.get('page')
+    try:
+        contacts = paginator.page(page)
+    except PageNotAnInteger:
+        contacts = paginator.page(1)
+    except EmptyPage:
+        contacts = paginator.page(paginator.num_pages)
+
     context = {
         'posts': posts,
         'comment_form': CommentForm(),
+        'contacts': contacts,
     }
+
     return render(request, 'post/post_list.html', context)
 
 
@@ -176,10 +193,47 @@ def hashtag_post_list(request, tag_name):
     #
     # 2. 쿼리셋 작성
     #   특정 tag_name이 해당 Post에 포함된 Comment의 tags에 포함되어있는 Post목록 쿼리 생성
-    #        posts = Post.objects.filter()
-    #
+    #        posts = Post.objects.filter(comment__tags=tag).distinct()
+    #        posts = get_object_or_404()
     # 3. urls.py와 이 view를 연결
     # 4. 해당 쿼리셋을 적절히 리턴
     # 5. Comment의 make_html_and_add_tags()메서드의
     #    a태그를 생성하는 부분에 이 view에 연결되는 URL을 삽입
-    pass
+    # Post에 달린 댓글의 Tag까지 검색할 때
+    # posts = Post.objects.filter(comment__tags=tag).distinct()
+
+    # Post의 my_comment에 있는 Tag만 검색할 때
+    tag = get_object_or_404(Tag, name=tag_name)
+    posts = Post.objects.filter(my_comment__tags=tag)
+    posts_count = posts.count()
+    paginator = Paginator(posts, 10)
+    page = request.GET.get('page')
+    try:
+        contacts = paginator.page(page)
+    except PageNotAnInteger:
+        contacts = paginator.page(1)
+    except EmptyPage:
+        contacts = paginator.page(paginator.num_pages)
+
+    context = {
+        'tag': tag,
+        'posts': posts,
+        'posts_count': posts_count,
+        'contacts': contacts,
+    }
+    return render(request, 'post/hashtag_post_list.html', context)
+
+
+@login_required
+def post_like(request, post_pk):
+    post = get_object_or_404(Post, pk=post_pk)
+
+    if post.postlike_set.filter(user=request.user).exists():  # 따봉눌렀는가 확인
+        post.postlike_set.get(user=request.user).delete() #다시 눌렀을때 삭제시켜서 없애버림
+    else:
+        post.postlike_set.get_or_create(user=request.user) #안눌렀다면 눌름
+
+    next = request.GET.get('next')
+    if next:
+        return redirect(next)
+    return redirect('post:post_list')
