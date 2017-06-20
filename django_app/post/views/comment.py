@@ -10,11 +10,12 @@ from post.models import Post
 
 User = get_user_model()
 
-__all__ =(
+__all__ = (
     'comment_create',
     'comment_delete',
     'comment_modify',
 )
+
 
 @require_POST
 @login_required
@@ -30,16 +31,23 @@ def comment_create(request, post_pk):
             form.save(post=post, author=request.user)
         else:
             result = '<br>'.join(['<br>'.join(v) for v in form.errors.values()])
-            messages.error(request,form.errors)
+            messages.error(request, form.errors)
 
         if next:
             return redirect(next)
         return redirect('post:post_detail', post_pk=post.pk)
 
 
-def comment_modify(request, post_pk):
-    # 수정
-    pass
+def comment_modify(request, comment_pk):
+    comment = get_object_or_404(Post, pk=comment_pk)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+    else:
+        form = CommentForm(instance=comment)
+    context = {
+        'form': form
+    }
+    return render(request, 'post/comment_modify.html', context)
 
 
 def comment_delete(request, post_pk, comment_pk):
