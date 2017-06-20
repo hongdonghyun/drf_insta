@@ -46,10 +46,14 @@
                 {% endif %}
             </div>
         </div>
+        {% if post.like_count != 0 %}
         <p class="comment">좋아요 {{ post.like_count }}개</p>
-        {% for author in post.like_users.all %}
-        <a href="#">{{ author.username }}</a>{%if forloop.counter0 != 1 %}, {% endif %}{% endfor%}<span>님이 좋아합니다.</span>
 
+        {% for author in post.like_users.all %}
+        <a href="#">{{ author.username }}</a>{%if forloop.counter != 1 %}, {% endif %}{% endfor %}<span>님이 좋아합니다.</span>
+        {% else %}
+        <span>제일 먼저 <a href="{% url 'post:post_like' post_pk=post.pk %}?next={{ request.path }}#post-{{ post.pk }}">좋아요</a>를 눌러보세요.</span>
+        {% endif %}
         <div class="post-comment-container">
             <!--해당 post에 my_comment가 있을 경우 표시-->
             {% if post.my_comment %}
