@@ -38,6 +38,7 @@ urlpatterns = [
 
     # comment_delete와 매칭
     url(r'^comment/(?P<comment_pk>\d+)/delete/$', views.comment_delete, name='comment_delete'),
+
     # 위쪽의 결과들과 매칭되지 않을 경우
     # url(r'^.*/$', views.post_anyway, name='post_anyway'),
 ]

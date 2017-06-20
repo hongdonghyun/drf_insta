@@ -38,34 +38,37 @@ def comment_create(request, post_pk):
     if next:
         return redirect(next)
     return redirect('post:post_detail', post_pk=post.pk)
+
+
 @comment_owner
 @login_required
 def comment_modify(request, comment_pk):
-    # 수정
-    # CommentForm을 만들어서 해당 ModelForm안에서 생성/수정가능하도록 사용
-    next = request.GET.get('next')
+    # get_object_or_404를 이용해서 Comment객체 가져오기
     comment = get_object_or_404(Comment, pk=comment_pk)
+    next = request.GET.get('next')
     if request.method == 'POST':
-        form = CommentForm(data=request.POST,instance=comment)
+        # Form을 이용해 객체를 update시킴 (data에 포함된 부분만 update됨)
+        form = CommentForm(data=request.POST, instance=comment)
         form.save()
         if next:
             return redirect(next)
-        return redirect('post:post_detail',post_pk=comment.post.pk)
+        return redirect('post:post_detail', post_pk=comment.post.pk)
     else:
+        # CommentForm에 기존 comment인스턴스의 내용을 채운 bound form
         form = CommentForm(instance=comment)
     context = {
         'form': form,
     }
     return render(request, 'post/comment_modify.html', context)
 
+
 @comment_owner
 @require_POST
 @login_required
-def comment_delete(request, post_pk, comment_pk):
-    # POST요청을 받아 Comment객체를 delete, 이후 post_detail페이지로 redirect
-    # comment_delete후에 원래 페이지로 돌아갈 수 있도록 처리
-    # ( post_list에서 삭제하면 해당 리스트의 post위치로)
-    comment = get_object_or_404(Comment,pk=comment_pk)
+def comment_delete(request, comment_pk):
+    # comment_delete이후에 원래 페이지로 돌아갈 수 있도록 처리해보기
+    #   (리스트에서 삭제하면 해당 리스트의 post위치로)
+    comment = get_object_or_404(Comment, pk=comment_pk)
     post = comment.post
     comment.delete()
-    return redirect('post:post_detail',post_pk=post.pk)
+    return redirect('post:post_detail', post_pk=post.pk)
