@@ -1,4 +1,5 @@
 {% extends 'common/base.html' %}
+{% load custom_tags %}
 
 {% block content %}
 	<!--4. post_list.html에서 for loop사용해 전달된 posts변수 순환 및 출력-->
@@ -6,10 +7,24 @@
 		include
 			https://docs.djangoproject.com/en/1.11/ref/templates/builtins/#include
 	-->
+    <div class="test">{{ request.GET|query_string }}</div>
 	{% for post in posts %}
 		<div>
 			<a href="{% url 'post:post_create' %}" class="btn">Post Create</a>
 		</div>
 		{% include 'include/post.html' with type='list' %}
+
+
+
 	{% endfor %}
+    {% if posts.has_previous %}
+    <a href="{{ request.path }}?page=1" class="btn">처음</a>
+    <a href="{{ request.path }}?page={{ posts.previous_page_number }}" class="btn">이전({{ posts.previous_page_number }})</a>
+    {% endif %}
+    <a class="btn">현재 페이지 : {{ posts.number }}</a>
+    {% if posts.has_next %}
+    <a href="{{ request.path }}?page={{ posts.next_page_number }}" class="btn">다음({{ posts.next_page_number }})</a>
+    <a href="{{ request.path }}?page={{ posts.paginator.num_pages }}" class="btn">마지막</a>
+    {% endif %}
+
 {% endblock %}

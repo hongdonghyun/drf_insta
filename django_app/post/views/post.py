@@ -6,9 +6,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
 from django.urls import reverse
 
-from post.decorators import post_owner
-from post.forms import CommentForm
-from ..forms import PostForm
+from ..decorators import post_owner
+from ..forms import PostForm, CommentForm
 from ..models import Post, Tag
 
 # 자동으로 Django에서 인증에 사용하는 User모델클래스를 리턴
@@ -26,6 +25,15 @@ __all__ = (
 )
 
 
+def post_list_original(request):
+    posts = Post.objects.all()
+    context = {
+        'posts': posts,
+        'comment_form': CommentForm(),
+    }
+    return render(request, 'post/post_list.html', context)
+
+
 def post_list(request):
     # 모든 Post목록을 'posts'라는 key로 context에 담아 return render처리
     # post/post_list.html을 template으로 사용하도록 한다
@@ -35,20 +43,19 @@ def post_list(request):
     # 여기숙제
     # post_list와 hashtag_post_list에서 pagination을 이용해서
     # 한번에 10개씩만 표시되도 수정
-    posts = Post.objects.all()
-    paginator = Paginator(posts, 10)
+    all_posts = Post.objects.all()
+    paginator = Paginator(all_posts, 2)
     page = request.GET.get('page')
     try:
-        contacts = paginator.page(page)
+        posts = paginator.page(page)
     except PageNotAnInteger:
-        contacts = paginator.page(1)
+        posts = paginator.page(1)
     except EmptyPage:
-        contacts = paginator.page(paginator.num_pages)
+        posts = paginator.page(paginator.num_pages)
 
     context = {
-        'posts': posts,
         'comment_form': CommentForm(),
-        'contacts': contacts,
+        'posts': posts,
     }
 
     return render(request, 'post/post_list.html', context)
@@ -204,22 +211,21 @@ def hashtag_post_list(request, tag_name):
 
     # Post의 my_comment에 있는 Tag만 검색할 때
     tag = get_object_or_404(Tag, name=tag_name)
-    posts = Post.objects.filter(my_comment__tags=tag)
-    posts_count = posts.count()
-    paginator = Paginator(posts, 10)
+    all_posts = Post.objects.filter(my_comment__tags=tag)
+    posts_count = all_posts.count()
+    paginator = Paginator(all_posts, 10)
     page = request.GET.get('page')
     try:
-        contacts = paginator.page(page)
+        posts = paginator.page(page)
     except PageNotAnInteger:
-        contacts = paginator.page(1)
+        posts = paginator.page(1)
     except EmptyPage:
-        contacts = paginator.page(paginator.num_pages)
+        posts = paginator.page(paginator.num_pages)
 
     context = {
         'tag': tag,
-        'posts': posts,
         'posts_count': posts_count,
-        'contacts': contacts,
+        'posts': posts,
     }
     return render(request, 'post/hashtag_post_list.html', context)
 
@@ -229,9 +235,9 @@ def post_like(request, post_pk):
     post = get_object_or_404(Post, pk=post_pk)
 
     if post.postlike_set.filter(user=request.user).exists():  # 따봉눌렀는가 확인
-        post.postlike_set.get(user=request.user).delete() #다시 눌렀을때 삭제시켜서 없애버림
+        post.postlike_set.get(user=request.user).delete()  # 다시 눌렀을때 삭제시켜서 없애버림
     else:
-        post.postlike_set.get_or_create(user=request.user) #안눌렀다면 눌름
+        post.postlike_set.get_or_create(user=request.user)  # 안눌렀다면 눌름
 
     next = request.GET.get('next')
     if next:

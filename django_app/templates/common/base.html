@@ -88,20 +88,6 @@
     {{contact.full_name|upper}}
 </div>
 {% endfor %}
-<div class="pagination">
-    <span class="step-links">
-        {% if contacts.has_previous %}
-            <a href="?page={{ contacts.previous_page_number }}"><<이전</a>
-        {% endif %}
 
-        <span class="current">
-            전체 {{ contacts.paginator.num_pages }} 페이지 중 {{ contacts.number }}
-        </span>
-
-        {% if contacts.has_next %}
-            <a href="?page={{ contacts.next_page_number }}">다음>></a>
-        {% endif %}
-    </span>
-</div>
 </body>
 </html>

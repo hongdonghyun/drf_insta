@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_tags %}
 <article id="post-{{ post.pk }}" class="post">
     <header>
         <div class="post-header-left">
@@ -50,7 +51,8 @@
         <p class="comment">좋아요 {{ post.like_count }}개</p>
 
         {% for author in post.like_users.all %}
-        <a href="#">{{ author.username }}</a>{%if forloop.counter != 1 %}, {% endif %}{% endfor %}<span>님이 좋아합니다.</span>
+        {%if forloop.counter != 1 %}, {% endif %}
+        <a href="#">{{ author.username }}</a>{% endfor %}<span>님이 좋아합니다.</span>
         {% else %}
         <span>제일 먼저 <a href="{% url 'post:post_like' post_pk=post.pk %}?next={{ request.path }}#post-{{ post.pk }}">좋아요</a>를 눌러보세요.</span>
         {% endif %}
@@ -73,7 +75,7 @@
             {% endfor %}
         </div>
         <p class="created">{{ post.created_date }}</p>
-        <form action="{% url 'post:comment_create' post_pk=post.pk %}?next={{ request.path }}#post-{{ post.pk }}"
+        <form action="{% url 'post:comment_create' post_pk=post.pk %}?next={{ request.path }}{{ request.GET|query_string }}#post-{{ post.pk }}"
               method="POST">
             {% csrf_token %}
             {{ comment_form.content }}
