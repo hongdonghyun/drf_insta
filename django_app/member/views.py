@@ -149,19 +149,27 @@ def profile(request, user_pk=None):
     else:
         cur_user = request.user
 
-    user_posts = cur_user.post_set.all().order_by('-created_date')
+
     page = request.GET.get('page')
-    user_post_count = user_posts.count()
+
+    post_count = cur_user.post_set.count()
+    default_page = 3
+    if post_count % default_page: #0되면 false
+        temp_page = abs(post_count // default_page +1) # 정수 나누기 ex) 5 / 4 = 1
+    else: #if에서 0일때
+        temp_page = abs(post_count // default_page) # 정수나누기 ex) 6 / 3 =2
 
     try:
-        page = int(page)
-
-        if page == 1:
-            user_posts = user_posts[:page * 9]
-        elif page:
-            pass
+        if page.isdigit():  # 문자열이 숫자인가?
+            page = int(page)
+            print(page)
     except:
         page = 1
+
+    if page > temp_page:
+        page = temp_page
+
+    user_posts = cur_user.post_set.all().order_by('-created_date')[:(page*default_page)]
     context = {
         'cur_user': cur_user,
         'user_posts': user_posts,

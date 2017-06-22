@@ -30,13 +30,14 @@
         {% endfor %}
     </div>
     <div>
-        {% for index in page %}
+
         {% for post in user_posts %}
         {% include 'include/post.html' %}
         {% endfor %}
-        {% endfor %}
-        <a href="{{ request.path }}?page={{ user_posts.previous_page_number }}" class="btn">이전</a>
-        <a href="{{ request.path }}?page={{ user_posts.next_page_number }}" class="btn">다음</a>
+
+        {% if page|multiple_:3 <= user_posts.count %}
+        <a href="{{ request.path }}?page={{ page|add:'1' }}" class="btn">다음</a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
