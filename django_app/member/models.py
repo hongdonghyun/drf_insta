@@ -58,7 +58,7 @@ class User(AbstractUser):
         # 해당 user를 내가 follow하고 있는지 bool여부를 반환
         return self.follow_relations.filter(to_user=user).exists()
 
-    def is_follower(self,user):
+    def is_follower(self, user):
         # 해당 user가 나를 follow하고 있는지 bool여부를 반환
         return self.follow_reltations.filter(from_user=user).exists()
 
@@ -71,14 +71,14 @@ class User(AbstractUser):
     @property
     def following(self):
         # 내가 follow중인 User QuerySet
-        #return Relation.objects.filter(from_user=self)
+        # return Relation.objects.filter(from_user=self)
         relations = self.follow_relations.all()
         return User.objects.filter(pk__in=relations.values('to_user'))
 
     @property
     def followers(self):
         # '나를 follow중인 User QuerySet'
-        #return Relation.objects.filter(to_user=self)
+        # return Relation.objects.filter(to_user=self)
         relations = self.follower_relations.all()
         return User.objects.filter(pk__in=relations.values('from_user'))
 
@@ -89,9 +89,9 @@ class User(AbstractUser):
 
 class Relation(models.Model):
     from_user = models.ForeignKey(User, related_name='follow_relations')
-    #follow하는 사람 from_User
+    # follow하는 사람 from_User
     to_user = models.ForeignKey(User, related_name='follower_relations')
-    #follow 당하는사람 to_user
+    # follow 당하는사람 to_user
     created_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

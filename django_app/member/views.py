@@ -149,15 +149,14 @@ def profile(request, user_pk=None):
     else:
         cur_user = request.user
 
-
     page = request.GET.get('page')
 
     post_count = cur_user.post_set.count()
     default_page = 3
-    if post_count % default_page: #0되면 false
-        temp_page = abs(post_count // default_page +1) # 정수 나누기 ex) 5 / 4 = 1
-    else: #if에서 0일때
-        temp_page = abs(post_count // default_page) # 정수나누기 ex) 6 / 3 =2
+    if post_count % default_page:  # 0되면 false
+        temp_page = abs(post_count // default_page + 1)  # 정수 나누기 ex) 5 / 4 = 1
+    else:  # if에서 0일때
+        temp_page = abs(post_count // default_page)  # 정수나누기 ex) 6 / 3 =2
 
     try:
         if page.isdigit():  # 문자열이 숫자인가?
@@ -169,7 +168,7 @@ def profile(request, user_pk=None):
     if page > temp_page:
         page = temp_page
 
-    user_posts = cur_user.post_set.all().order_by('-created_date')[:(page*default_page)]
+    user_posts = cur_user.post_set.all().order_by('-created_date')[:(page * default_page)]
     context = {
         'cur_user': cur_user,
         'user_posts': user_posts,
@@ -197,4 +196,8 @@ def follow_toggle(request, user_pk):
                 4. block처리시 follow상태는 해제되어야 함 (동시적용 불가)
                 4. 로그인 시 post_list에서 block_users의 글은 보이지 않도록 함
     '''
-    pass
+
+    to_user = User.objects.get(pk=user_pk)
+    if request.method == "POST":
+        request.user.follow_toggle(to_user)
+    return redirect('my_profile')
