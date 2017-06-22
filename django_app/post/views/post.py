@@ -5,6 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
 from django.urls import reverse
+from django.views.decorators.http import require_POST
 
 from ..decorators import post_owner
 from ..forms import PostForm, CommentForm
@@ -230,14 +231,19 @@ def hashtag_post_list(request, tag_name):
     return render(request, 'post/hashtag_post_list.html', context)
 
 
+@require_POST
 @login_required
 def post_like(request, post_pk):
     post = get_object_or_404(Post, pk=post_pk)
+    #
+    # if post.postlike_set.filter(user=request.user).exists():  # 따봉눌렀는가 확인
+    #     post.postlike_set.get(user=request.user).delete()  # 다시 눌렀을때 삭제시켜서 없애버림
+    # else:
+    #     post.postlike_set.get_or_create(user=request.user)  # 안눌렀다면 눌름
 
-    if post.postlike_set.filter(user=request.user).exists():  # 따봉눌렀는가 확인
-        post.postlike_set.get(user=request.user).delete()  # 다시 눌렀을때 삭제시켜서 없애버림
-    else:
-        post.postlike_set.get_or_create(user=request.user)  # 안눌렀다면 눌름
+    post_like, post_like_created = post.postlike_set.get_or_create(user=request.user)
+    if not post_like_created:
+        post_like.delete()
 
     next = request.GET.get('next')
     if next:

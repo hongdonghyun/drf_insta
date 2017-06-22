@@ -66,7 +66,6 @@ class Comment(models.Model):
         super().save(*args, **kwargs)
         self.make_html_content_and_add_tags()
 
-
     def make_html_content_and_add_tags(self):
         # 해시태그에 해당하는 정규표현식
         p = re.compile(r'(#\w+)')
@@ -80,7 +79,7 @@ class Comment(models.Model):
             tag, _ = Tag.objects.get_or_create(name=tag_name.replace('#', ''))
             # 기존 content의 내용을 변경
             change_tag = '<a href="{url}" class="hash-tag">{tag_name}</a>'.format(
-                url=reverse('post:hashtag_post_list',kwargs={'tag_name':tag_name.replace('#','')}),
+                url=reverse('post:hashtag_post_list', kwargs={'tag_name': tag_name.replace('#', '')}),
                 tag_name=tag_name
             )
             ori_content = re.sub(r'{}(?![<\w])'.format(tag_name), change_tag, ori_content, count=1)
@@ -90,6 +89,7 @@ class Comment(models.Model):
         # 편집이 완료된 문자열을 html_content에 저장
         self.html_content = ori_content
         super().save(update_fields=['html_content'])
+
 
 class CommentLike(models.Model):
     comment = models.ForeignKey(Comment)

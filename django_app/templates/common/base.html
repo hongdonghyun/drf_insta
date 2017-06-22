@@ -57,7 +57,11 @@
                 안되어있으면 a태그로 로그인창으로 이동할 수 있는 링크 추가
             -->
             <div>
+
                 {% if user.is_authenticated %}
+                <div class ='post-create'>
+                    <a href="{% url 'post:post_create' %}" class="btn">Post Create</a>
+                </div>
                 <span>{{ user }}로 로그인 중</span>
                 <a href="{% url 'member:logout' %}" class="btn">로그아웃</a>
                 {% else %}
