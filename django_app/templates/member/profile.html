@@ -32,15 +32,19 @@
         </a>
         {% endfor %}
     </div>
-    <div>
 
+    <ul class="profile-photo-list">
         {% for post in user_posts %}
-        {% include 'include/post.html' %}
+        <li>
+            <img src="{{ post.photo.url }}" alt="">
+        </li>
         {% endfor %}
 
-        {% if page|multiple_:3 <= user_posts.count %}
-        <a href="{{ request.path }}?page={{ page|add:'1' }}" class="btn">다음</a>
-        {% endif %}
-    </div>
+    </ul>
+    {% if request.GET.page %}
+    <a href="?page={{ request.GET.page|add:1 }}" class="btn">더 보기</a>
+    {% else %}
+    <a href="?page=2" class="btn btn-primary btn-block btn-lg">더 보기</a>
+    {% endif %}
 </div>
 {% endblock %}

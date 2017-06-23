@@ -125,7 +125,9 @@ def signup(request):
     return render(request, 'member/signup.html', context)
 
 
+@login_required
 def profile(request, user_pk=None):
+    default_page = 3
     # 1. user_pk에 해당하는 User를 cur_user키로  render
     # 2. member/profile.html작성, 해당 user정볼 보여주기
     #   2-1. 해당 user의 followers, following 목록 보여주기
@@ -149,24 +151,27 @@ def profile(request, user_pk=None):
     else:
         cur_user = request.user
 
+    next = request.GET.get('next')
     page = request.GET.get('page')
 
     post_count = cur_user.post_set.count()
-    default_page = 3
     if post_count % default_page:  # 0되면 false
         temp_page = abs(post_count // default_page + 1)  # 정수 나누기 ex) 5 / 4 = 1
     else:  # if에서 0일때
         temp_page = abs(post_count // default_page)  # 정수나누기 ex) 6 / 3 =2
 
     try:
-        if page.isdigit():  # 문자열이 숫자인가?
-            page = int(page)
-            print(page)
-    except:
+        page = int(page) if int(page) > 1 else 1
+    except ValueError:
+        page = 1
+    except Exception as e:
         page = 1
 
     if page > temp_page:
         page = temp_page
+
+    if next:
+        return redirect(next)
 
     user_posts = cur_user.post_set.all().order_by('-created_date')[:(page * default_page)]
     context = {

@@ -15,9 +15,23 @@
   border-radius: 1px;
   line-height: 1.6;
 }
+.btn-lg {
+  font-size: 14px;
+  padding: 9px 18px;
+}
+.btn-primary {
+  background-color: $color-theme;
+}
+.btn-block {
+  display: block;
+  width:100%;
+  box-sizing: border-box;
+  text-align: center;
+
+}
 .field-wrapper {
   margin-bottom: 10px;
-  
+
   ul.errors {
     font-size: 11px;
     color: red;
