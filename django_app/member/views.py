@@ -151,7 +151,6 @@ def profile(request, user_pk=None):
     else:
         cur_user = request.user
 
-    next = request.GET.get('next')
     page = request.GET.get('page')
 
     post_count = cur_user.post_set.count()
@@ -170,14 +169,15 @@ def profile(request, user_pk=None):
     if page > temp_page:
         page = temp_page
 
-    if next:
-        return redirect(next)
-
-    user_posts = cur_user.post_set.all().order_by('-created_date')[:(page * default_page)]
+    user_posts = cur_user.post_set.order_by('-created_date')[:(page * default_page)]
+    user_posts_count = cur_user.post_set.count()
+    next_page = page + 1 if post_count > page * default_page else None
     context = {
         'cur_user': cur_user,
         'user_posts': user_posts,
+        'user_posts_count': user_posts_count,
         'page': page,
+        'next_page': next_page,
     }
     return render(request, 'member/profile.html', context)
 
@@ -201,8 +201,9 @@ def follow_toggle(request, user_pk):
                 4. block처리시 follow상태는 해제되어야 함 (동시적용 불가)
                 4. 로그인 시 post_list에서 block_users의 글은 보이지 않도록 함
     '''
-
-    to_user = User.objects.get(pk=user_pk)
-    if request.method == "POST":
-        request.user.follow_toggle(to_user)
-    return redirect('my_profile')
+    next = request.GET.get('next')
+    to_user = get_object_or_404(request,user_pk)
+    request.user.follow_toggle(to_user)
+    if next:
+        return redirect(next)
+    return redirect('member:profile',user_pk=user_pk)

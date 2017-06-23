@@ -4,7 +4,8 @@
 <div class="content">
     <h1>{{ cur_user }}</h1>
     {% if user != cur_user %}
-    <form action="{% url 'member:follow_toggle' %} user_pk=cur_user.pk" method="POST">
+
+    <form action="{% url 'member:follow_toggle'  user_pk=cur_user.pk %}" method="POST">
         {% csrf_token %}
         {% if cur_user in user.following %}
         <button type="submit" class="btn">팔로우 취소</button>
@@ -36,15 +37,15 @@
     <ul class="profile-photo-list">
         {% for post in user_posts %}
         <li>
-            <img src="{{ post.photo.url }}" alt="">
+            <a href="{% url 'post:post_detail' post_pk=post.pk %}">
+                <img src="{{ post.photo.url }}" alt="">
+            </a>
         </li>
         {% endfor %}
 
     </ul>
-    {% if request.GET.page %}
-    <a href="?page={{ request.GET.page|add:1 }}" class="btn">더 보기</a>
-    {% else %}
-    <a href="?page=2" class="btn btn-primary btn-block btn-lg">더 보기</a>
+    {% if next_page %}
+    <a href="?page={{ page|add:1 }}" class="btn">더 보기</a>
     {% endif %}
 </div>
 {% endblock %}
