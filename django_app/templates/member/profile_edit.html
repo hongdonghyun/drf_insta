@@ -6,7 +6,7 @@
     <form action="" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {% include 'include/field_set.html' with form=form %}
-    <button type="submit" class="btn btn-lg btn-block">프로필 수정</button>
+    <button type="submit" class="btn btn-lg btn-block btn-primary">프로필 수정</button>
         </form>
 </div>
 {% endblock %}

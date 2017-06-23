@@ -31,7 +31,7 @@ class User(AbstractUser):
     img_profile = CustomImageField(
         upload_to='user',
         blank=True,
-        default_static_image='',
+        default_static_image='images/profile.png',
     )
     nickname = models.CharField(max_length=24, null=True, unique=True)
     relations = models.ManyToManyField(
