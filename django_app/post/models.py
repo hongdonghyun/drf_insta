@@ -79,6 +79,7 @@ class Comment(models.Model):
             tag, _ = Tag.objects.get_or_create(name=tag_name.replace('#', ''))
             # 기존 content의 내용을 변경
             change_tag = '<a href="{url}" class="hash-tag">{tag_name}</a>'.format(
+                # url=reverse('post:hashtag_post_list', args=[tag_name.replace('#', '')]),
                 url=reverse('post:hashtag_post_list', kwargs={'tag_name': tag_name.replace('#', '')}),
                 tag_name=tag_name
             )

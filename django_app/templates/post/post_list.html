@@ -1,4 +1,5 @@
 {% extends 'common/base.html' %}
+<!--utils패키지의 templatetags.custom_tags를 가리킴-->
 {% load custom_tags %}
 
 {% block content %}
@@ -7,22 +8,30 @@
 		include
 			https://docs.djangoproject.com/en/1.11/ref/templates/builtins/#include
 	-->
-    <div class="test">{{ request.GET|query_string }}</div>
+
+	<!--custom_tags의 query_string커스텀 필터를 사용-->
+	<div class="test">{{ request.GET|query_string }}</div>
 	{% for post in posts %}
-
 		{% include 'include/post.html' with type='list' %}
-
-
-
 	{% endfor %}
-    {% if posts.has_previous %}
-    <a href="{{ request.path }}?page=1" class="btn">처음</a>
-    <a href="{{ request.path }}?page={{ posts.previous_page_number }}" class="btn">이전({{ posts.previous_page_number }})</a>
-    {% endif %}
-    <a class="btn">현재 페이지 : {{ posts.number }}</a>
-    {% if posts.has_next %}
-    <a href="{{ request.path }}?page={{ posts.next_page_number }}" class="btn">다음({{ posts.next_page_number }})</a>
-    <a href="{{ request.path }}?page={{ posts.paginator.num_pages }}" class="btn">마지막</a>
-    {% endif %}
+
+
+	{% if posts.has_previous %}
+	<!--첫 번째 페이지로 가는 링크-->
+	<a href="{{ request.path }}?page=1" class="btn">처음</a>
+	<!--이전 페이지로 가는 링크-->
+	<a href="{{ request.path }}?page={{ posts.previous_page_number }}" class="btn">이전 ({{ posts.previous_page_number }}페이지)</a>
+	{% endif %}
+
+	<a class="btn">현재 {{ posts.number }}페이지</a>
+
+
+	{% if posts.has_next %}
+	<!--다음 페이지로 가는 링크-->
+	<a href="{{ request.path }}?page={{ posts.next_page_number }}" class="btn">다음 ({{ posts.next_page_number }}페이지)</a>
+	<!--마지막 페이지로 가는 링크-->
+	<a href="{{ request.path }}?page={{ posts.paginator.num_pages }}" class="btn">끝</a>
+	{% endif %}
+
 
 {% endblock %}

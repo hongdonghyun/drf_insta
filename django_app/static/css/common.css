@@ -8,6 +8,11 @@
   font-size: 11px;
 }
 
+.btn-lg {
+  font-size: 14px;
+  padding: 9px 18px;
+}
+
 .btn-xs {
   font-size: 10px;
   padding: 2px 6px;
@@ -15,20 +20,16 @@
   line-height: 1.6;
 }
 
-.btn-lg {
-  font-size: 14px;
-  padding: 9px 18px;
-}
-
-.btn-primary {
-  background-color: #3897f0;
-}
-
 .btn-block {
   display: block;
   width: 100%;
   box-sizing: border-box;
   text-align: center;
+}
+
+.btn-primary {
+  background-color: #3897f0;
+  color: white;
 }
 
 .field-wrapper {
@@ -68,5 +69,5 @@ form.form-inline {
 }
 
 a.hash-tag {
-  color: #003569;
+  color: #44709c;
 }

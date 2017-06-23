@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from post.decorators import comment_owner
+from utils.templatetags.custom_tags import query_string
 from ..forms import CommentForm
 from ..models import Post, Comment
 
@@ -53,7 +54,7 @@ def comment_modify(request, comment_pk):
             form.save()
             if next:
                 return redirect(next)
-        return redirect('post:post_detail', post_pk=comment.post.pk)
+            return redirect('post:post_detail', post_pk=comment.post.pk)
     else:
         # CommentForm에 기존 comment인스턴스의 내용을 채운 bound form
         form = CommentForm(instance=comment)
@@ -67,12 +68,9 @@ def comment_modify(request, comment_pk):
 @require_POST
 @login_required
 def comment_delete(request, comment_pk):
-    next = request.GET.get('next')
     # comment_delete이후에 원래 페이지로 돌아갈 수 있도록 처리해보기
     #   (리스트에서 삭제하면 해당 리스트의 post위치로)
     comment = get_object_or_404(Comment, pk=comment_pk)
     post = comment.post
     comment.delete()
-    if next:
-        return redirect(next)
     return redirect('post:post_detail', post_pk=post.pk)

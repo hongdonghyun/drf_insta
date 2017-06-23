@@ -7,8 +7,9 @@ from django.template import loader
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
-from ..decorators import post_owner
-from ..forms import PostForm, CommentForm
+from post.decorators import post_owner
+from post.forms import CommentForm
+from ..forms import PostForm
 from ..models import Post, Tag
 
 # 자동으로 Django에서 인증에 사용하는 User모델클래스를 리턴
@@ -21,12 +22,23 @@ __all__ = (
     'post_create',
     'post_modify',
     'post_delete',
+    'post_like_toggle',
     'hashtag_post_list',
-    'post_like',
 )
 
 
 def post_list_original(request):
+    # 모든 Post목록을 'posts'라는 key로 context에 담아 return render처리
+    # post/post_list.html을 template으로 사용하도록 한다
+
+    # 각 포스트에 대해 최대 4개까지의 댓글을 보여주도록 템플릿에 설정
+    # 각 post하나당 CommentForm을 하나씩 가지도록 리스트 컴프리헨션 사용
+
+    # 숙제
+    # 1. post_list와 hashtag_post_list에서 pagination을 이용해서
+    #    한 번에 10개씩만 표시하도록 수정
+    #   https://docs.djangoproject.com/en/1.11/topics/pagination/
+    # 2. 좋아요 버튼 구현 및 좋아요 한 사람 목록 출력
     posts = Post.objects.all()
     context = {
         'posts': posts,
@@ -36,29 +48,33 @@ def post_list_original(request):
 
 
 def post_list(request):
-    # 모든 Post목록을 'posts'라는 key로 context에 담아 return render처리
-    # post/post_list.html을 template으로 사용하도록 한다
-
-    # 각 포스트에 대해 최대 4개까지의 댓글을 보여주도록 템플릿에 설정
-
-    # 여기숙제
-    # post_list와 hashtag_post_list에서 pagination을 이용해서
-    # 한번에 10개씩만 표시되도 수정
+    # 전체 Post목록 QuerySet생성 (아직 평가되지 않음)
     all_posts = Post.objects.all()
-    paginator = Paginator(all_posts, 2)
-    page = request.GET.get('page')
+    # Paginator객체 생성, 한 페이지당 3개씩
+    p = Paginator(all_posts, 3)
+
+    # GET parameter에서 'page'값을 page_num변수에 할당
+    page_num = request.GET.get('page')
+
+    # Paginator객체에서 page메서드로 page_num변수를 인수로 전달하여 호출
     try:
-        posts = paginator.page(page)
+        posts = p.page(page_num)
+
+    # 만약 page_num변수가 int형으로 변환이 불가능하면
     except PageNotAnInteger:
-        posts = paginator.page(1)
+        # 1페이지에 해당하는 Post object list를 posts에 할당
+        posts = p.page(1)
+    # 만약 page_num에 객체가 없을 경우 (빈 페이지)
     except EmptyPage:
-        posts = paginator.page(paginator.num_pages)
+        # 마지막 페이지에 해당하는 Post object list를 posts에 할당
+        posts = p.page(p.num_pages)
 
+    # render에 사용할 dict객체
     context = {
-        'comment_form': CommentForm(),
         'posts': posts,
+        # 'comment_form': CommentForm(),
+        'comment_form': CommentForm(auto_id=False),
     }
-
     return render(request, 'post/post_list.html', context)
 
 
@@ -192,6 +208,36 @@ def post_delete(request, post_pk):
         return render(request, 'post/post_delete.html', context)
 
 
+@require_POST
+@login_required
+def post_like_toggle(request, post_pk):
+    # 1. post_pk에 해당하는 Post instance를 변수(post)에 할당
+    post = get_object_or_404(Post, pk=post_pk)
+    # 2. post에서 PostLike로의 RelatedManager를 사용해서
+    #       post속성이 post, user속성이 request.user인 PostLike가 있는지 get_or_create
+    # M2M필드가 중간자모델을 거치지 않을 경우
+    # if request.user not in post.like_users:
+    #     post.like_users.add(request.user)
+
+    # 중간자모델을 사용할 경우
+    # get_or_create를 사용해서 현재 Post와 request.user에 해당하는 PostLike인스턴스를 가져옴
+    post_like, post_like_created = post.postlike_set.get_or_create(
+        user=request.user
+    )
+
+    # 3. 이후 created여부에 따라 해당 PostLike인스턴스를 삭제 또는 그냥 넘어가기
+    # post_like_created가 get_or_create를 통해 새로 PostLike가 만들어졌는지, 아니면 기존에 있었는지 여부를 나타냄
+    if not post_like_created:
+        # 기존에 PostLike가 있었다면 삭제해준다
+        post_like.delete()
+
+    # 4. 리턴주소는 next가 주어질 경우 next, 아닐 경우 post_detail로
+    # next = request.GET.get('next')
+    # if next:
+    #     return redirect(next)
+    return redirect('post:post_detail', post_pk=post.pk)
+
+
 def hashtag_post_list(request, tag_name):
     # 1. template생성
     #   post/hashtag_post_list.html
@@ -201,51 +247,25 @@ def hashtag_post_list(request, tag_name):
     #
     # 2. 쿼리셋 작성
     #   특정 tag_name이 해당 Post에 포함된 Comment의 tags에 포함되어있는 Post목록 쿼리 생성
-    #        posts = Post.objects.filter(comment__tags=tag).distinct()
-    #        posts = get_object_or_404()
+    #        posts = Post.objects.filter()
+    #
     # 3. urls.py와 이 view를 연결
     # 4. 해당 쿼리셋을 적절히 리턴
     # 5. Comment의 make_html_and_add_tags()메서드의
     #    a태그를 생성하는 부분에 이 view에 연결되는 URL을 삽입
+    tag = get_object_or_404(Tag, name=tag_name)
+
     # Post에 달린 댓글의 Tag까지 검색할 때
     # posts = Post.objects.filter(comment__tags=tag).distinct()
 
     # Post의 my_comment에 있는 Tag만 검색할 때
-    tag = get_object_or_404(Tag, name=tag_name)
-    all_posts = Post.objects.filter(my_comment__tags=tag)
-    posts_count = all_posts.count()
-    paginator = Paginator(all_posts, 10)
-    page = request.GET.get('page')
-    try:
-        posts = paginator.page(page)
-    except PageNotAnInteger:
-        posts = paginator.page(1)
-    except EmptyPage:
-        posts = paginator.page(paginator.num_pages)
+    posts = Post.objects.filter(my_comment__tags=tag)
+    posts_count = posts.count()
 
     context = {
         'tag': tag,
-        'posts_count': posts_count,
         'posts': posts,
+        'posts_count': posts_count,
     }
     return render(request, 'post/hashtag_post_list.html', context)
 
-
-@require_POST
-@login_required
-def post_like(request, post_pk):
-    post = get_object_or_404(Post, pk=post_pk)
-    #
-    # if post.postlike_set.filter(user=request.user).exists():  # 따봉눌렀는가 확인
-    #     post.postlike_set.get(user=request.user).delete()  # 다시 눌렀을때 삭제시켜서 없애버림
-    # else:
-    #     post.postlike_set.get_or_create(user=request.user)  # 안눌렀다면 눌름
-
-    post_like, post_like_created = post.postlike_set.get_or_create(user=request.user)
-    if not post_like_created:
-        post_like.delete()
-
-    next = request.GET.get('next')
-    if next:
-        return redirect(next)
-    return redirect('post:post_list')
