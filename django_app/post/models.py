@@ -5,6 +5,7 @@ member application생성
 이후 해당 settings.AUTH_USER_MODEL모델을 Post나 Comment에서 author나 user항목으로 참조
 """
 import re
+
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
@@ -103,3 +104,8 @@ class Tag(models.Model):
 
     def __str__(self):
         return 'Tag({})'.format(self.name)
+
+
+class Video(models.Model):
+    youtube_id = models.CharField(max_length=200, unique=True)
+    q = models.CharField(max_length=100,blank=True)

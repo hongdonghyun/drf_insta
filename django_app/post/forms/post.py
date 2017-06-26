@@ -1,6 +1,5 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AnonymousUser
 
 from ..models import Post, Comment
 
@@ -64,3 +63,6 @@ class PostForm(forms.ModelForm):
             instance.save()
         # ModelForm의 save()에서 반환해야 하는 model의 instance리턴
         return instance
+
+
+

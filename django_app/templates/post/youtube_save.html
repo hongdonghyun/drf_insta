@@ -1,0 +1,15 @@
+{% extends 'common/base.html' %}
+
+{% block content %}
+{% for video in videos %}
+<div>
+
+    <form action="" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <iframe src="https://www.youtube.com/embed/{{ video.youtube_id }}"></iframe>
+        <button type="submit" class="btn">포스팅하기</button>
+    </form>
+</div>
+{% endfor %}
+
+{% endblock %}
