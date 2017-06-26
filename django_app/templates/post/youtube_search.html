@@ -8,19 +8,12 @@
     </form>
     <div>
         <ul>
-            {% for item in response.items %}
+            {% for video in videos %}
             <li>
-                <strong>{{ forloop.counter }} :</strong>
-                <img src="{{ item.snippet.thumbnails.high.url }}" alt="" width="150" height="150">
-                <iframe src="https://www.youtube.com/embed/{{ item.id.videoId }}?rel=0&autoplay=False" frameborder="0"
-                        allowfullscreen="true" scrolling="no"
-                        width="300"
-                        height="300">
-
-                </iframe>
+                <h3>{{ forloop.counter }} : {{ video.youtube_title }}</h3>
+                <iframe src="https://www.youtube.com/embed/{{ video.youtube_id }}" frameborder="0" width="300" height="300"></iframe>
+                <a href="{% url 'post:youtube_create' youtube_id=video.youtube_id %}" class="btn btn-primary">포스팅</a>
             </li>
-
-
             {% endfor %}
         </ul>
     </div>
