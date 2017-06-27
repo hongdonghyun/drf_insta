@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_POST
 
 from post.models import Video, Post, Comment
-from utils.youtube.youtube_search import search
+from utils.youtube.youtube_search import search_original
 
 __all__ = (
     'youtube_search',
@@ -29,7 +29,7 @@ def youtube_search(request):
     url_api_search = 'https://www.googleapis.com/youtube/v3/search'
     q = request.GET.get('q')
     if q:
-        data = search(q)
+        data = search_original(q)
         # data내부의 'items'키에는 list형태의 데이터가 옴. 이를 순회
         for item in data['items']:
             # CustomManager를 사용해 object생성
