@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 
 from ..forms import UserEditForm
 
@@ -80,23 +80,44 @@ def profile(request, user_pk=None):
     }
     return render(request, 'member/profile.html', context)
 
+    # 2. member/profile.html작성, 해당 user정보 보여주기
+    #   2-1. 해당 user의 followers, following목록 보여주기
+
+    # 3. 현재 로그인한 유저가 해당 유저(cur_user)를 팔로우하고 있는지 여부 보여주기
+    #   3-1. 팔로우하고 있다면 '팔로우 해제'버튼, 아니라면 '팔로우'버튼 띄워주기
+    # 4~ -> def follow_toggle(request)뷰 생성
+
 
 @login_required
 def profile_edit(request):
-    form = UserEditForm(instance=request.user)
     """
-     request.method == "POST"
-     닉네임과 img_profile(모델에 필드 추가)를 수정할 수 있게 함
-     UserEditForm을 구성 (ModelForm상속 및 사용)
+    request.method == 'POST'일 때
+        nickname과 img_profile(필드도 모델에 추가)을 수정할 수 있는
+        UserEditForm을 구성 (ModelForm상속)
+        및 사용
+
+    1. UserEditForm구성
+    2. 이 view에서 request method가 GET일때,
+        해당 Form에 request.user에 해당하는 User를 이용해
+        bound form을 만듬
+    3. POST요청일 때, 받은 데이터를 이용해 Form에 bind된
+        User instance를 업데이트
     """
-    if request.method == "POST":
-        form = UserEditForm(data=request.POST, instance=request.user, files=request.FILES)
+    if request.method == 'POST':
+        # UserEditForm에 수정할 data를 함께 binding
+        form = UserEditForm(
+            data=request.POST,
+            files=request.FILES,
+            instance=request.user
+        )
+        # data가 올바를 경우 (유효성 통과)
         if form.is_valid():
+            # form.save()를 이용해 instance를 update
             form.save()
             return redirect('member:my_profile')
     else:
-        form = UserEditForm()
+        form = UserEditForm(instance=request.user)
     context = {
-        'form': form
+        'form': form,
     }
     return render(request, 'member/profile_edit.html', context)

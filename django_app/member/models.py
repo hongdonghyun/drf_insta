@@ -3,7 +3,6 @@ import re
 import requests
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager as DefaultUserManager
-from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.db import models
 
@@ -13,12 +12,13 @@ from utils.fields import CustomImageField
 class UserManager(DefaultUserManager):
     def get_or_create_facebook_user(self, user_info):
         username = '{}_{}_{}'.format(
-            User.USER_TYPE_FACEBOOK,
+            self.model.USER_TYPE_FACEBOOK,
             settings.FACEBOOK_APP_ID,
             user_info['id']
         )
-        user, user_created = User.objects.get_or_create(
+        user, user_created = self.get_or_create(
             username=username,
+            user_type=self.model.USER_TYPE_FACEBOOK,
             defaults={
                 'last_name': user_info.get('last_name', ''),
                 'first_name': user_info.get('first_name', ''),
@@ -37,15 +37,17 @@ class UserManager(DefaultUserManager):
                 user.pk,
                 file_ext
             )
+            # Python tempfile
+            # https://docs.python.org/3/library/tempfile.html
             # 이미지파일을 임시저장할 파일객체
-            temp_file = NamedTemporaryFile(delete=False)
+            temp_file = NamedTemporaryFile()
             # 프로필 이미지 URL에 대한 get요청 (이미지 다운로드)
             response = requests.get(url_picture)
             # 요청 결과를 temp_file에 기록
             temp_file.write(response.content)
             # ImageField의 save()메서드를 호출해서 해당 임시파일객체를 주어진 이름의 파일로 저장
             # 저장하는 파일명은 위에서 만든 <유저pk.주어진파일확장자> 를 사용
-            user.img_profile.save(file_name, File(temp_file))
+            user.img_profile.save(file_name, temp_file)
         return user
 
 
@@ -54,6 +56,7 @@ class User(AbstractUser):
     동작
         follow : 내가 다른사람을 follow함
         unfollow : 내가 다른사람에게 한 follow를 취소함
+
     속성
         followers : 나를 follow하고 있는 사람들
         follower : 나를 follow하고 있는 사람
@@ -62,6 +65,7 @@ class User(AbstractUser):
         friends : 나와 서로 follow하고 있는 모든 관계
         없음 : 내가 follow하고 있는 사람 1명
             (나는 저 사람의 follower이다 또는 나는 저 사람을 follow하고 있다 라고 표현)
+
     ex) 내가 박보영, 최유정, 고성현을 follow하고 고성현과 김수정은 나를 follow한다
         나의 followers는 고성현, 김수정
         나의 following은 박보영, 최유정

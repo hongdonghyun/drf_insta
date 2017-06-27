@@ -269,10 +269,3 @@ def hashtag_post_list(request, tag_name):
     }
     return render(request, 'post/hashtag_post_list.html', context)
 
-# def video_post(request):
-#     if request.method =="POST":
-
-
-# [2] 위 과제로 완성된 검색결과에서 '포스팅하기'버튼을 구현, Post가 YouTube영상을 포함하도록 함
-#    검색결과에서 '포스팅하기'버튼을 누르면, 해당 Video와 연결된 Post를 생성
-#    post_list에서 Video와 연결된 Post는 영상을 보여주도록 함

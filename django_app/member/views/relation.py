@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_POST
 
 User = get_user_model()
@@ -8,6 +8,7 @@ User = get_user_model()
 __all__ = (
     'follow_toggle',
 )
+
 
 @require_POST
 @login_required

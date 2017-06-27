@@ -1,14 +1,13 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
-
-from config import settings
 
 User = get_user_model()
 
 
 class FacebookBackend:
-    def authenticate(self, request, facebook_id):  # facebook_id
+    def authenticate(self, request, facebook_id):
         username = '{}_{}_{}'.format(
-            self.model.USER_TYPE_FACEBOOK,
+            User.USER_TYPE_FACEBOOK,
             settings.FACEBOOK_APP_ID,
             facebook_id,
         )
@@ -23,6 +22,6 @@ class FacebookBackend:
 
     def get_user(self, user_id):
         try:
-            return User.objects.get(pk=user_id)
+            return User.objets.get(pk=user_id)
         except User.DoesNotExist:
             return None
