@@ -1,10 +1,10 @@
-import requests
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_POST
 
 from post.models import Video, Post, Comment
+from utils.youtube.youtube_search import search
 
 __all__ = (
     'youtube_search',
@@ -29,17 +29,7 @@ def youtube_search(request):
     url_api_search = 'https://www.googleapis.com/youtube/v3/search'
     q = request.GET.get('q')
     if q:
-        search_params = {
-            'part': 'snippet',
-            'key': 'AIzaSyACCLlnn_hlOpNk5XUBpRqs-iZWpbTm-J4',
-            'maxResults': '10',
-            'type': 'video',
-            'q': q,
-        }
-        # YouTube의 search api에 요청, 응답 받음
-        response = requests.get(url_api_search, params=search_params)
-        # 응답은 JSON형태로 오며, json()메서드로 파이썬 객체 형식으로 변환
-        data = response.json()
+        data = search(q)
         # data내부의 'items'키에는 list형태의 데이터가 옴. 이를 순회
         for item in data['items']:
             # CustomManager를 사용해 object생성
