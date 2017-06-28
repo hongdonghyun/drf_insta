@@ -1,10 +1,11 @@
+import requests
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_POST
 
 from post.models import Video, Post, Comment
-from utils.youtube.youtube_search import search_original
+from utils import youtube
 
 __all__ = (
     'youtube_search',
@@ -12,7 +13,7 @@ __all__ = (
 )
 
 
-def youtube_search(request):
+def youtube_search_original(request):
     # [1] 검색결과를 DB에 저장하고, 해당내용을 템플릿에서 보여주기!
     # 1. 유튜브 영상을 저장할 class Video(models.Model)생성
     # 2. 검색결과의 videoId를 Video의 youtube_id필드에 저장
@@ -29,7 +30,17 @@ def youtube_search(request):
     url_api_search = 'https://www.googleapis.com/youtube/v3/search'
     q = request.GET.get('q')
     if q:
-        data = search_original(q)
+        search_params = {
+            'part': 'snippet',
+            'key': 'AIzaSyACCLlnn_hlOpNk5XUBpRqs-iZWpbTm-J4',
+            'maxResults': '10',
+            'type': 'video',
+            'q': q,
+        }
+        # YouTube의 search api에 요청, 응답 받음
+        response = requests.get(url_api_search, params=search_params)
+        # 응답은 JSON형태로 오며, json()메서드로 파이썬 객체 형식으로 변환
+        data = response.json()
         # data내부의 'items'키에는 list형태의 데이터가 옴. 이를 순회
         for item in data['items']:
             # CustomManager를 사용해 object생성
@@ -55,8 +66,8 @@ def youtube_search(request):
         # re_pattern = '|'.join(['({})'.format(item) for item in q.split()])
         # title과 description중 하나만 조건을 만족하면 됨
         videos = Video.objects.filter(
-            Q(title__iregex=r'{}'.format(re_pattern)) |
-            Q(description__iregex=r'{}'.format(re_pattern))
+            Q(title__regex=r'{}'.format(re_pattern)) |
+            Q(description__regex=r'{}'.format(re_pattern))
         )
 
         context = {
@@ -81,6 +92,26 @@ def youtube_search(request):
         # requests.get을 사용한 결과를 변수에 할당하고
         # 해당 변수를 템플릿에서 표시
         context = {}
+    return render(request, 'post/youtube_search.html', context)
+
+
+def youtube_search(request):
+    """
+    유튜브 검색을 라이브러리 형태로 정리
+    """
+    context = dict()
+    q = request.GET.get('q')
+    if q:
+        # YouTube검색부분을 패키지화
+        data = youtube.search(q)
+        for item in data['items']:
+            Video.objects.create_from_search_result(item)
+        re_pattern = ''.join(['(?=.*{})'.format(item) for item in q.split()])
+        videos = Video.objects.filter(
+            Q(title__iregex=re_pattern) |
+            Q(description__iregex=re_pattern)
+        )
+        context['videos'] = videos
     return render(request, 'post/youtube_search.html', context)
 
 
