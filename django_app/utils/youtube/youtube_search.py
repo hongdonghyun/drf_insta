@@ -1,6 +1,5 @@
 import requests
 from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 
 
 def search_original(q):
@@ -21,20 +20,14 @@ YOUTUBE_API_SERVICE_NAME = "https://www.googleapis.com/"
 YOUTUBE_API_VERSION = "v3"
 
 
-def youtube_search(options):
+def search(q):
     youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
                     developerKey=DEVELOPER_KEY)
 
     search_response = youtube.search().list(
-        q=options.q,
+        q=q,
         part="id,snippet",
-        maxResults=options.max_results,
+        maxResults=10,
         type='video'
     ).execute()
-
-    try:
-        youtube_search(args)
-    except HttpError as e:
-        print("An HTTP error %d occurred:\n%s" % (e.resp.status, e.content))
-
-
+    return search_response

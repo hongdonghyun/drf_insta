@@ -55,8 +55,8 @@ def youtube_search(request):
         # re_pattern = '|'.join(['({})'.format(item) for item in q.split()])
         # title과 description중 하나만 조건을 만족하면 됨
         videos = Video.objects.filter(
-            Q(title__regex=r'{}'.format(re_pattern)) |
-            Q(description__regex=r'{}'.format(re_pattern))
+            Q(title__iregex=r'{}'.format(re_pattern)) |
+            Q(description__iregex=r'{}'.format(re_pattern))
         )
 
         context = {
