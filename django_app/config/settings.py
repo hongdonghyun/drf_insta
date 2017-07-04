@@ -185,4 +185,4 @@ SECRET_KEY = 'uu))u(v9bm256960ik8%yddi7-*7lw)!un2)%99=!*6z-i&p=$'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
