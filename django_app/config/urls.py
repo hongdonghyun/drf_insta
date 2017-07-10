@@ -17,8 +17,9 @@ from django.conf import settings
 from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.views.generic import RedirectView
+from rest_framework.urlpatterns import format_suffix_patterns
 
+from post.views import api_views
 from . import views
 
 urlpatterns = [
@@ -36,7 +37,11 @@ urlpatterns = [
     # post앱의 urls.py모듈을 include시킨다
     url(r'^post/', include('post.urls')),
     url(r'^member/', include('member.urls')),
+    url(r'^api_post_list/', api_views.Api_Post_List.as_view()),
+    url(r'^api_post_detail/(?P<pk>[0-9]+)/$', api_views.Api_Post_Detail.as_view())
+
 ]
+urlpatterns = format_suffix_patterns(urlpatterns)
 urlpatterns += static(
     prefix=settings.MEDIA_URL,
     document_root=settings.MEDIA_ROOT
